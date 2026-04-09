@@ -12,28 +12,54 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
 }
 
-/* ---- Hero entrance ---- */
+/* ── Custom cursor (pointer devices only) ─────────────────────── */
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+/* ── Hero entrance ────────────────────────────────────────────── */
 @keyframes hero-fade-in {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(22px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
 .animate-hero-in {
   animation: hero-fade-in 0.7s ease-out both;
 }
 
-/* ---- Scroll reveal ---- */
+/* ── Letter-by-letter name animation ─────────────────────────── */
+@keyframes letter-appear {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-letter {
+  display: inline-block;
+  animation: letter-appear 0.5s ease-out both;
+}
+
+/* ── Scroll reveal ────────────────────────────────────────────── */
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -44,20 +70,26 @@ body {
     transform: translateY(0);
   }
 }
-
 .reveal {
   opacity: 0;
 }
-
 .reveal.in-view {
   animation: reveal-up 0.6s ease-out both;
   animation-delay: var(--reveal-delay, 0s);
 }
 
-/* ---- Hero grid ---- */
+/* ── Background grid ──────────────────────────────────────────── */
 .hero-grid {
   background-image:
     linear-gradient(to right, rgba(139, 92, 246, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
   background-size: 64px 64px;
+}
+
+/* ── Noise texture overlay ────────────────────────────────────── */
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.025;
+  pointer-events: none;
 }

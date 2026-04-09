@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -8,6 +8,7 @@ type Project = {
   title: string;
   description: string;
   stack: string[];
+  mockupType: "chalet" | "pokemon";
   liveUrl?: string;
   githubUrl?: string;
 };
@@ -17,20 +18,24 @@ type StackItem = {
   colorClass: string;
 };
 
-// ─── Data  ────────────────────────────────────────────────────────────────────
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const PROJECTS: Project[] = [
   {
     title: "Chalet Site",
-    description: "Site vitrine de location de chalet.",
+    description:
+      "Site vitrine de location de chalet. Design épuré, performances optimisées et expérience utilisateur soignée.",
     stack: ["Next.js", "TypeScript"],
+    mockupType: "chalet",
     liveUrl: undefined, // TODO: lien live
     githubUrl: undefined, // TODO: lien GitHub
   },
   {
     title: "Pokemon TCG",
-    description: "App React/Node autour des cartes Pokémon.",
+    description:
+      "App React/Node autour des cartes Pokémon. Browse, recherche et gestion de collection.",
     stack: ["React", "Node.js"],
+    mockupType: "pokemon",
     liveUrl: undefined,
     githubUrl: undefined, // TODO: lien GitHub
   },
@@ -118,6 +123,25 @@ function ExternalLinkIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
+function MailIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+  );
+}
+
 function ChevronDownIcon() {
   return (
     <svg
@@ -133,71 +157,291 @@ function ChevronDownIcon() {
   );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Custom Cursor ────────────────────────────────────────────────────────────
 
-function ProjectCard({
-  project,
-  delay,
-}: {
-  project: Project;
-  delay: number;
-}) {
-  const hasLinks = project.githubUrl || project.liveUrl;
+function CustomCursor() {
+  const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
+  const mouse = useRef({ x: -200, y: -200 });
+  const ringPos = useRef({ x: -200, y: -200 });
+  const hovering = useRef(false);
 
+  useEffect(() => {
+    let raf: number;
+
+    const onMove = (e: MouseEvent) => {
+      mouse.current = { x: e.clientX, y: e.clientY };
+      if (dotRef.current) {
+        dotRef.current.style.opacity = "1";
+      }
+    };
+
+    const onOver = (e: MouseEvent) => {
+      const interactive = (e.target as Element).closest("a, button");
+      if (interactive && !hovering.current) {
+        hovering.current = true;
+        if (ringRef.current) {
+          ringRef.current.style.width = "48px";
+          ringRef.current.style.height = "48px";
+          ringRef.current.style.borderColor = "rgba(139, 92, 246, 0.7)";
+        }
+        if (dotRef.current) dotRef.current.style.opacity = "0";
+      } else if (!interactive && hovering.current) {
+        hovering.current = false;
+        if (ringRef.current) {
+          ringRef.current.style.width = "32px";
+          ringRef.current.style.height = "32px";
+          ringRef.current.style.borderColor = "rgba(139, 92, 246, 0.35)";
+        }
+        if (dotRef.current) dotRef.current.style.opacity = "1";
+      }
+    };
+
+    const animate = () => {
+      if (dotRef.current) {
+        dotRef.current.style.left = `${mouse.current.x}px`;
+        dotRef.current.style.top = `${mouse.current.y}px`;
+      }
+      ringPos.current.x += (mouse.current.x - ringPos.current.x) * 0.12;
+      ringPos.current.y += (mouse.current.y - ringPos.current.y) * 0.12;
+      if (ringRef.current) {
+        ringRef.current.style.left = `${ringPos.current.x}px`;
+        ringRef.current.style.top = `${ringPos.current.y}px`;
+      }
+      raf = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseover", onOver);
+    raf = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseover", onOver);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <>
+      <div
+        ref={dotRef}
+        aria-hidden="true"
+        className="fixed top-0 left-0 z-[9999] pointer-events-none -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-violet-400 opacity-0 transition-opacity duration-150"
+      />
+      <div
+        ref={ringRef}
+        aria-hidden="true"
+        className="fixed top-0 left-0 z-[9998] pointer-events-none -translate-x-1/2 -translate-y-1/2 rounded-full border"
+        style={{
+          width: "32px",
+          height: "32px",
+          borderColor: "rgba(139, 92, 246, 0.35)",
+          transition: "width 0.2s ease, height 0.2s ease, border-color 0.2s ease",
+        }}
+      />
+    </>
+  );
+}
+
+// ─── Navbar ───────────────────────────────────────────────────────────────────
+
+function Navbar() {
+  const [visible, setVisible] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    const handler = () => {
+      const y = window.scrollY;
+      setScrolled(y > 60);
+      setVisible(y < 60 || y < lastY.current);
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+  return (
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "border-b border-zinc-800/50 bg-[#0a0a0a]/80 backdrop-blur-xl"
+          : ""
+      } ${visible ? "translate-y-0" : "-translate-y-full"}`}
+    >
+      <nav className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        <button
+          onClick={() => scrollTo("hero")}
+          className="text-sm font-bold font-mono tracking-tight text-white hover:text-violet-400 transition-colors"
+        >
+          AG<span className="text-violet-500">.</span>
+        </button>
+        <div className="flex gap-1 text-sm text-zinc-400">
+          {[
+            { id: "about", label: "À propos" },
+            { id: "projets", label: "Projets" },
+            { id: "stack", label: "Stack" },
+            { id: "contact", label: "Contact" },
+          ].map(({ id, label }) => (
+            <button
+              key={id}
+              onClick={() => scrollTo(id)}
+              className="px-3 py-2 rounded-lg hover:text-white hover:bg-zinc-800/50 transition-all duration-200"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+// ─── Project Mockup ───────────────────────────────────────────────────────────
+
+function ProjectMockup({ type }: { type: "chalet" | "pokemon" }) {
+  return (
+    <div className="rounded-xl overflow-hidden border border-zinc-700/50 mb-5 select-none">
+      {/* Browser chrome */}
+      <div className="flex items-center gap-1.5 px-3 py-2 bg-zinc-800/80 border-b border-zinc-700/50">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+        <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+        <div className="flex-1 ml-2 h-4 rounded-sm bg-zinc-700/60 flex items-center px-2">
+          <span className="text-[9px] text-zinc-500 font-mono">
+            {type === "chalet"
+              ? "chalet-app.vercel.app"
+              : "pokemon-tcg.vercel.app"}
+          </span>
+        </div>
+      </div>
+
+      {type === "chalet" ? (
+        <div className="h-32 bg-gradient-to-br from-emerald-950/60 to-zinc-900 p-3 relative overflow-hidden">
+          {/* Nav bar */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="h-2.5 w-12 rounded bg-zinc-500/50" />
+            <div className="flex gap-2">
+              <div className="h-2 w-8 rounded bg-zinc-600/40" />
+              <div className="h-2 w-8 rounded bg-zinc-600/40" />
+              <div className="h-2 w-8 rounded bg-zinc-600/40" />
+            </div>
+          </div>
+          {/* Hero content */}
+          <div className="h-3 w-3/5 rounded bg-zinc-300/20 mb-1.5" />
+          <div className="h-2 w-2/5 rounded bg-zinc-500/30 mb-3" />
+          <div className="flex gap-2">
+            <div className="h-6 w-14 rounded-full bg-emerald-600/50 border border-emerald-500/30" />
+            <div className="h-6 w-14 rounded-full border border-zinc-600/50" />
+          </div>
+          {/* Mountain silhouette */}
+          <div
+            aria-hidden="true"
+            className="absolute bottom-0 right-0 w-0 h-0"
+            style={{
+              borderLeft: "70px solid transparent",
+              borderBottom: "55px solid rgba(16, 185, 129, 0.07)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute bottom-0 right-12 w-0 h-0"
+            style={{
+              borderLeft: "50px solid transparent",
+              borderBottom: "42px solid rgba(16, 185, 129, 0.05)",
+            }}
+          />
+        </div>
+      ) : (
+        <div className="h-32 bg-gradient-to-br from-yellow-950/40 to-zinc-900 p-3 relative overflow-hidden">
+          {/* Search bar */}
+          <div className="h-6 w-full rounded-lg bg-zinc-800/80 border border-zinc-700/50 mb-3 flex items-center px-2 gap-1.5">
+            <div className="w-3 h-3 rounded-full border border-zinc-600/60" />
+            <div className="h-1.5 flex-1 rounded bg-zinc-700/60" />
+          </div>
+          {/* Card grid */}
+          <div className="flex gap-1.5 overflow-hidden">
+            {[
+              "from-blue-900/70 to-blue-950/70 border-blue-700/40",
+              "from-red-900/70 to-red-950/70 border-red-700/40",
+              "from-yellow-900/70 to-yellow-950/70 border-yellow-700/40",
+              "from-green-900/70 to-green-950/70 border-green-700/40",
+              "from-purple-900/70 to-purple-950/70 border-purple-700/40",
+            ].map((classes, i) => (
+              <div
+                key={i}
+                className={`flex-shrink-0 w-10 h-14 rounded-[4px] bg-gradient-to-b border ${classes}`}
+              />
+            ))}
+          </div>
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-yellow-400/5 blur-lg"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Project Card ─────────────────────────────────────────────────────────────
+
+function ProjectCard({ project, delay }: { project: Project; delay: number }) {
   return (
     <article
       data-animate
       style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
-      className="reveal group relative flex flex-col p-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 hover:border-violet-500/40 transition-colors duration-300"
+      className="reveal group relative flex flex-col p-5 rounded-2xl border border-zinc-800 bg-zinc-900/30 hover:border-violet-500/40 transition-colors duration-300"
     >
-      {/* Title + link icons */}
-      <div className="flex items-start justify-between gap-4 mb-3">
-        <h3 className="text-xl font-bold text-white">{project.title}</h3>
-        {hasLinks && (
-          <div className="flex shrink-0 gap-3 text-zinc-500 pt-0.5">
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Code source — ${project.title}`}
-                className="hover:text-white transition-colors"
-              >
-                <GitHubIcon />
-              </a>
-            )}
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Site live — ${project.title}`}
-                className="hover:text-cyan-400 transition-colors"
-              >
-                <ExternalLinkIcon className="w-5 h-5" />
-              </a>
-            )}
-          </div>
-        )}
+      <ProjectMockup type={project.mockupType} />
+
+      <div className="flex items-start justify-between gap-4 mb-2">
+        <h3 className="text-lg font-bold text-white">{project.title}</h3>
+        <div className="flex shrink-0 gap-2.5 text-zinc-500 pt-0.5">
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Code source — ${project.title}`}
+              className="hover:text-white transition-colors"
+            >
+              <GitHubIcon />
+            </a>
+          )}
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Site live — ${project.title}`}
+              className="hover:text-cyan-400 transition-colors"
+            >
+              <ExternalLinkIcon className="w-5 h-5" />
+            </a>
+          )}
+        </div>
       </div>
 
-      <p className="text-zinc-400 text-sm leading-relaxed mb-5 flex-1">
+      <p className="text-zinc-400 text-sm leading-relaxed mb-4 flex-1">
         {project.description}
       </p>
 
-      {/* Stack badges */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {project.stack.map((tech) => (
           <span
             key={tech}
-            className="px-2.5 py-1 text-xs rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700"
+            className="px-2.5 py-0.5 text-xs rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700"
           >
             {tech}
           </span>
         ))}
       </div>
 
-      {/* Hover glow overlay */}
       <div
         aria-hidden="true"
         className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-600/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -205,6 +449,8 @@ function ProjectCard({
     </article>
   );
 }
+
+// ─── Stack Badge ──────────────────────────────────────────────────────────────
 
 function StackBadge({ item, delay }: { item: StackItem; delay: number }) {
   return (
@@ -233,16 +479,23 @@ export default function Home() {
       },
       { threshold: 0.1 }
     );
-
     document
       .querySelectorAll("[data-animate]")
       .forEach((el) => observer.observe(el));
-
     return () => observer.disconnect();
   }, []);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
+      {/* Global noise texture */}
+      <div
+        aria-hidden="true"
+        className="noise fixed inset-0 z-[2] pointer-events-none"
+      />
+
+      <CustomCursor />
+      <Navbar />
+
       {/* ══════════════════════════════════════════════════════ HERO */}
       <section
         id="hero"
@@ -251,34 +504,50 @@ export default function Home() {
         {/* Ambient glow */}
         <div
           aria-hidden="true"
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-violet-600/10 blur-[140px] pointer-events-none"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-violet-600/10 blur-[150px] pointer-events-none"
         />
-        {/* Grid pattern */}
+        {/* Grid */}
         <div
           aria-hidden="true"
           className="hero-grid absolute inset-0 pointer-events-none"
         />
 
         <div className="relative z-10 flex flex-col items-center gap-5 max-w-3xl w-full">
+          {/* Available badge */}
+          <div
+            className="animate-hero-in flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/5 text-green-400 text-xs font-mono"
+            style={{ animationDelay: "0s" }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Disponible pour missions
+          </div>
+
           <p
             className="animate-hero-in text-violet-400 text-xs font-mono tracking-[0.25em] uppercase"
-            style={{ animationDelay: "0.05s" }}
+            style={{ animationDelay: "0.1s" }}
           >
             Bonjour, je suis
           </p>
 
+          {/* Letter-by-letter name */}
           <h1
-            className="animate-hero-in text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none"
-            style={{ animationDelay: "0.15s" }}
+            className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none bg-gradient-to-r from-violet-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent"
+            aria-label="Alexis Gruny"
           >
-            <span className="bg-gradient-to-r from-violet-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent">
-              Alexis Gruny
-            </span>
+            {"Alexis Gruny".split("").map((char, i) => (
+              <span
+                key={i}
+                className="animate-letter"
+                style={{ animationDelay: `${0.2 + i * 0.05}s` }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </span>
+            ))}
           </h1>
 
           <p
             className="animate-hero-in text-zinc-500 text-sm sm:text-base italic"
-            style={{ animationDelay: "0.28s" }}
+            style={{ animationDelay: "0.95s" }}
           >
             Je construis des trucs sur internet le jour, je feed en ranked la
             nuit.
@@ -286,18 +555,18 @@ export default function Home() {
 
           <p
             className="animate-hero-in text-zinc-200 text-lg sm:text-xl font-medium"
-            style={{ animationDelay: "0.4s" }}
+            style={{ animationDelay: "1.1s" }}
           >
             Développeur Web Fullstack — React, Next.js &amp; Node.js
           </p>
 
           <div
             className="animate-hero-in flex flex-wrap gap-4 justify-center mt-2"
-            style={{ animationDelay: "0.52s" }}
+            style={{ animationDelay: "1.25s" }}
           >
             <a
               href={`mailto:${CONTACT.email}`}
-              className="px-6 py-3 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-all duration-200 hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] hover:-translate-y-0.5"
+              className="px-6 py-3 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-all duration-200 hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] hover:-translate-y-0.5"
             >
               Me contacter
             </a>
@@ -317,7 +586,7 @@ export default function Home() {
         <div
           aria-hidden="true"
           className="animate-hero-in absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-zinc-600 text-xs"
-          style={{ animationDelay: "1.1s" }}
+          style={{ animationDelay: "1.6s" }}
         >
           <div className="animate-bounce flex flex-col items-center gap-1">
             <span className="font-mono tracking-widest">scroll</span>
@@ -326,9 +595,101 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══════════════════════════════════════════════════ À PROPOS */}
+      <section id="about" className="py-28 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Text */}
+            <div>
+              <div data-animate className="reveal mb-6">
+                <p className="text-violet-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
+                  À propos
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-bold">
+                  Qui suis-je ?
+                </h2>
+              </div>
+              <div
+                data-animate
+                className="reveal space-y-4 text-zinc-400 leading-relaxed"
+                style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}
+              >
+                <p>
+                  Développeur web fullstack, je construis des applications de A
+                  à Z — de la base de données à l&apos;interface. J&apos;aime
+                  les projets où l&apos;attention au détail fait la différence.
+                </p>
+                <p>
+                  React et Next.js sont mon terrain de jeu principal.
+                  À l&apos;aise aussi bien sur le front que sur le back avec
+                  Node.js.
+                </p>
+                <p className="text-zinc-500 text-sm italic border-l-2 border-violet-500/40 pl-4">
+                  En dehors du code, tu me trouveras sur League of Legends à
+                  perdre mes games de ranked.
+                </p>
+              </div>
+            </div>
+
+            {/* Terminal decoration */}
+            <div
+              data-animate
+              className="reveal hidden lg:block"
+              style={{ "--reveal-delay": "0.15s" } as React.CSSProperties}
+            >
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 overflow-hidden">
+                <div className="flex items-center gap-1.5 px-4 py-3 border-b border-zinc-800 bg-zinc-900/80">
+                  <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                  <span className="ml-2 text-xs text-zinc-500 font-mono">
+                    about.ts
+                  </span>
+                </div>
+                <div className="p-5 font-mono text-xs leading-7">
+                  <p>
+                    <span className="text-violet-400">const</span>{" "}
+                    <span className="text-cyan-300">dev</span>{" "}
+                    <span className="text-zinc-400">=</span> {"{"}
+                  </p>
+                  <p className="ml-4">
+                    <span className="text-zinc-400">name:</span>{" "}
+                    <span className="text-green-300">&quot;Alexis Gruny&quot;</span>,
+                  </p>
+                  <p className="ml-4">
+                    <span className="text-zinc-400">role:</span>{" "}
+                    <span className="text-green-300">&quot;Fullstack Dev&quot;</span>,
+                  </p>
+                  <p className="ml-4">
+                    <span className="text-zinc-400">stack:</span> [
+                  </p>
+                  <p className="ml-8">
+                    <span className="text-yellow-300">&quot;React&quot;</span>,{" "}
+                    <span className="text-yellow-300">&quot;Next.js&quot;</span>,
+                  </p>
+                  <p className="ml-8">
+                    <span className="text-yellow-300">&quot;Node.js&quot;</span>,{" "}
+                    <span className="text-yellow-300">&quot;TypeScript&quot;</span>,
+                  </p>
+                  <p className="ml-4">],</p>
+                  <p className="ml-4">
+                    <span className="text-zinc-400">available:</span>{" "}
+                    <span className="text-violet-300">true</span>,
+                  </p>
+                  <p className="ml-4 text-zinc-600">
+                    {`// open to missions & CDI`}
+                  </p>
+                  <p>{"}"}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════════════════════════════════════════════ PROJETS */}
       <section id="projets" className="py-28 px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div data-animate className="reveal mb-14">
             <p className="text-violet-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
               Projets
@@ -337,10 +698,13 @@ export default function Home() {
               Ce que j&apos;ai construit
             </h2>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {PROJECTS.map((project, i) => (
-              <ProjectCard key={project.title} project={project} delay={i * 0.15} />
+              <ProjectCard
+                key={project.title}
+                project={project}
+                delay={i * 0.15}
+              />
             ))}
           </div>
         </div>
@@ -348,7 +712,7 @@ export default function Home() {
 
       {/* ════════════════════════════════════════════════════ STACK */}
       <section id="stack" className="py-28 px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div data-animate className="reveal mb-14">
             <p className="text-cyan-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
               Stack
@@ -357,7 +721,6 @@ export default function Home() {
               Avec quoi je travaille
             </h2>
           </div>
-
           <div className="flex flex-wrap gap-3">
             {STACK.map((item, i) => (
               <StackBadge key={item.label} item={item} delay={i * 0.07} />
@@ -366,14 +729,46 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══════════════════════════════════════════════════ CONTACT */}
+      <section id="contact" className="py-28 px-6 relative overflow-hidden">
+        {/* Ambient glow */}
+        <div
+          aria-hidden="true"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-violet-600/8 blur-[140px] pointer-events-none"
+        />
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <div data-animate className="reveal">
+            <p className="text-violet-400 text-xs font-mono tracking-[0.25em] uppercase mb-4">
+              Contact
+            </p>
+            <h2 className="text-4xl sm:text-6xl font-bold mb-5">
+              Travaillons{" "}
+              <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                ensemble
+              </span>
+            </h2>
+            <p className="text-zinc-400 mb-10 max-w-md mx-auto leading-relaxed">
+              Un projet en tête ? Une mission freelance ? Je suis disponible
+              pour en parler.
+            </p>
+            <a
+              href={`mailto:${CONTACT.email}`}
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-[0_0_60px_rgba(139,92,246,0.45)] hover:-translate-y-1"
+            >
+              <MailIcon />
+              {CONTACT.email}
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════════════════════════════════════════════ FOOTER */}
-      <footer className="border-t border-zinc-800/60 py-10 px-6 mt-10">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-zinc-800/60 py-10 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-zinc-600 text-sm">
             © 2025{" "}
             <span className="text-zinc-400 font-medium">Alexis Gruny</span>
           </p>
-
           <nav
             className="flex gap-6 text-sm text-zinc-500"
             aria-label="Liens sociaux"
