@@ -57,6 +57,18 @@ body {
 .animate-letter {
   display: inline-block;
   animation: letter-appear 0.5s ease-out both;
+  background: linear-gradient(to right, #a78bfa, #d8b4fe, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Gradient text fix ────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(to right, #a78bfa, #d8b4fe, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ── Scroll reveal ────────────────────────────────────────────── */

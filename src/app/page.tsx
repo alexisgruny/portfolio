@@ -80,7 +80,7 @@ const STACK: StackItem[] = [
 ];
 
 const CONTACT = {
-  email: "alexis@gruny.dev",
+  email: "alexisgc.dev@gmail.com",
   github: "https://github.com/alexisgruny",
   malt: "https://www.malt.fr/profile/alexisgruny",
 };
@@ -531,7 +531,13 @@ export default function Home() {
 
           {/* Letter-by-letter name */}
           <h1
-            className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none bg-gradient-to-r from-violet-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent"
+            className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none"
+            style={{
+              background: "linear-gradient(to right, #a78bfa, #d8b4fe, #22d3ee)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
             aria-label="Alexis Gruny"
           >
             {"Alexis Gruny".split("").map((char, i) => (
