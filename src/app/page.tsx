@@ -27,8 +27,8 @@ const PROJECTS: Project[] = [
       "Site vitrine de location de chalet. Design épuré, performances optimisées et expérience utilisateur soignée.",
     stack: ["Next.js", "TypeScript"],
     mockupType: "chalet",
-    liveUrl: undefined, // TODO: lien live
-    githubUrl: undefined, // TODO: lien GitHub
+    liveUrl: "https://chalet-jaia-preview.vercel.app/",
+    githubUrl: "https://github.com/alexisgruny/chalet-site"
   },
   {
     title: "Pokemon TCG",
@@ -37,7 +37,7 @@ const PROJECTS: Project[] = [
     stack: ["React", "Node.js"],
     mockupType: "pokemon",
     liveUrl: undefined,
-    githubUrl: undefined, // TODO: lien GitHub
+    githubUrl: "https://github.com/alexisgruny/Pokemon-tcg-test"
   },
 ];
 
