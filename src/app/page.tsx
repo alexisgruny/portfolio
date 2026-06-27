@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -303,7 +304,21 @@ function Navbar() {
 
 // ─── Project Mockup ───────────────────────────────────────────────────────────
 
+const MOCKUP_CONFIG = {
+  chalet: {
+    src: "/DemoChaletJaia.png",
+    alt: "Aperçu du site Chalet JAIA",
+    url: "chalet-jaia-preview.vercel.app",
+  },
+  pokemon: {
+    src: "/pokemonTgcp.png",
+    alt: "Aperçu de l'app Pokémon TCG Trade",
+    url: "pokemon-tcg.vercel.app",
+  },
+} as const;
+
 function ProjectMockup({ type }: { type: "chalet" | "pokemon" }) {
+  const { src, alt, url } = MOCKUP_CONFIG[type];
   return (
     <div className="rounded-xl overflow-hidden border border-zinc-700/50 mb-5 select-none">
       {/* Browser chrome */}
@@ -312,78 +327,19 @@ function ProjectMockup({ type }: { type: "chalet" | "pokemon" }) {
         <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
         <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
         <div className="flex-1 ml-2 h-4 rounded-sm bg-zinc-700/60 flex items-center px-2">
-          <span className="text-[9px] text-zinc-500 font-mono">
-            {type === "chalet"
-              ? "chalet-app.vercel.app"
-              : "pokemon-tcg.vercel.app"}
-          </span>
+          <span className="text-[9px] text-zinc-500 font-mono">{url}</span>
         </div>
       </div>
-
-      {type === "chalet" ? (
-        <div className="h-32 bg-gradient-to-br from-emerald-950/60 to-zinc-900 p-3 relative overflow-hidden">
-          {/* Nav bar */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="h-2.5 w-12 rounded bg-zinc-500/50" />
-            <div className="flex gap-2">
-              <div className="h-2 w-8 rounded bg-zinc-600/40" />
-              <div className="h-2 w-8 rounded bg-zinc-600/40" />
-              <div className="h-2 w-8 rounded bg-zinc-600/40" />
-            </div>
-          </div>
-          {/* Hero content */}
-          <div className="h-3 w-3/5 rounded bg-zinc-300/20 mb-1.5" />
-          <div className="h-2 w-2/5 rounded bg-zinc-500/30 mb-3" />
-          <div className="flex gap-2">
-            <div className="h-6 w-14 rounded-full bg-emerald-600/50 border border-emerald-500/30" />
-            <div className="h-6 w-14 rounded-full border border-zinc-600/50" />
-          </div>
-          {/* Mountain silhouette */}
-          <div
-            aria-hidden="true"
-            className="absolute bottom-0 right-0 w-0 h-0"
-            style={{
-              borderLeft: "70px solid transparent",
-              borderBottom: "55px solid rgba(16, 185, 129, 0.07)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute bottom-0 right-12 w-0 h-0"
-            style={{
-              borderLeft: "50px solid transparent",
-              borderBottom: "42px solid rgba(16, 185, 129, 0.05)",
-            }}
-          />
-        </div>
-      ) : (
-        <div className="h-32 bg-gradient-to-br from-yellow-950/40 to-zinc-900 p-3 relative overflow-hidden">
-          {/* Search bar */}
-          <div className="h-6 w-full rounded-lg bg-zinc-800/80 border border-zinc-700/50 mb-3 flex items-center px-2 gap-1.5">
-            <div className="w-3 h-3 rounded-full border border-zinc-600/60" />
-            <div className="h-1.5 flex-1 rounded bg-zinc-700/60" />
-          </div>
-          {/* Card grid */}
-          <div className="flex gap-1.5 overflow-hidden">
-            {[
-              "from-blue-900/70 to-blue-950/70 border-blue-700/40",
-              "from-red-900/70 to-red-950/70 border-red-700/40",
-              "from-yellow-900/70 to-yellow-950/70 border-yellow-700/40",
-              "from-green-900/70 to-green-950/70 border-green-700/40",
-              "from-purple-900/70 to-purple-950/70 border-purple-700/40",
-            ].map((classes, i) => (
-              <div
-                key={i}
-                className={`flex-shrink-0 w-10 h-14 rounded-[4px] bg-gradient-to-b border ${classes}`}
-              />
-            ))}
-          </div>
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-3 -right-3 w-20 h-20 rounded-full bg-yellow-400/5 blur-lg"
-          />
-        </div>
-      )}
+      {/* Screenshot */}
+      <div className="relative h-40 overflow-hidden">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover object-top"
+          sizes="(max-width: 640px) 100vw, 50vw"
+        />
+      </div>
     </div>
   );
 }
