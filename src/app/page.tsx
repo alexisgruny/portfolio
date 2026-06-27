@@ -183,7 +183,7 @@ function CustomCursor() {
         if (ringRef.current) {
           ringRef.current.style.width = "48px";
           ringRef.current.style.height = "48px";
-          ringRef.current.style.borderColor = "rgba(139, 92, 246, 0.7)";
+          ringRef.current.style.borderColor = "rgba(244, 63, 94, 0.7)";
         }
         if (dotRef.current) dotRef.current.style.opacity = "0";
       } else if (!interactive && hovering.current) {
@@ -191,7 +191,7 @@ function CustomCursor() {
         if (ringRef.current) {
           ringRef.current.style.width = "32px";
           ringRef.current.style.height = "32px";
-          ringRef.current.style.borderColor = "rgba(139, 92, 246, 0.35)";
+          ringRef.current.style.borderColor = "rgba(244, 63, 94, 0.35)";
         }
         if (dotRef.current) dotRef.current.style.opacity = "1";
       }
@@ -227,7 +227,7 @@ function CustomCursor() {
       <div
         ref={dotRef}
         aria-hidden="true"
-        className="fixed top-0 left-0 z-[9999] pointer-events-none -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-violet-400 opacity-0 transition-opacity duration-150"
+        className="fixed top-0 left-0 z-[9999] pointer-events-none -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-rose-400 opacity-0 transition-opacity duration-150"
       />
       <div
         ref={ringRef}
@@ -236,7 +236,7 @@ function CustomCursor() {
         style={{
           width: "32px",
           height: "32px",
-          borderColor: "rgba(139, 92, 246, 0.35)",
+          borderColor: "rgba(244, 63, 94, 0.35)",
           transition: "width 0.2s ease, height 0.2s ease, border-color 0.2s ease",
         }}
       />
@@ -276,9 +276,9 @@ function Navbar() {
       <nav className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
         <button
           onClick={() => scrollTo("hero")}
-          className="text-sm font-bold font-mono tracking-tight text-white hover:text-violet-400 transition-colors"
+          className="text-sm font-bold font-mono tracking-tight text-white hover:text-rose-400 transition-colors"
         >
-          AG<span className="text-violet-500">.</span>
+          AG<span className="text-rose-500">.</span>
         </button>
         <div className="flex gap-1 text-sm text-zinc-400">
           {[
@@ -395,7 +395,7 @@ function ProjectCard({ project, delay }: { project: Project; delay: number }) {
     <article
       data-animate
       style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
-      className="reveal group relative flex flex-col p-5 rounded-2xl border border-zinc-800 bg-zinc-900/30 hover:border-violet-500/40 transition-colors duration-300"
+      className="reveal group relative flex flex-col p-5 rounded-2xl border border-zinc-800 bg-zinc-900/30 hover:border-rose-500/40 transition-colors duration-300"
     >
       <ProjectMockup type={project.mockupType} />
 
@@ -444,7 +444,7 @@ function ProjectCard({ project, delay }: { project: Project; delay: number }) {
 
       <div
         aria-hidden="true"
-        className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-600/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+        className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-600/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
       />
     </article>
   );
@@ -504,26 +504,26 @@ export default function Home() {
         {/* Ambient glow */}
         <div
           aria-hidden="true"
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-violet-600/10 blur-[150px] pointer-events-none"
-        />
-        {/* Grid */}
-        <div
-          aria-hidden="true"
-          className="hero-grid absolute inset-0 pointer-events-none"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full bg-rose-500/5 blur-[120px] pointer-events-none"
         />
 
         <div className="relative z-10 flex flex-col items-center gap-5 max-w-3xl w-full">
-          {/* Available badge */}
+          {/* Status + location badges */}
           <div
-            className="animate-hero-in flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/5 text-green-400 text-xs font-mono"
+            className="animate-hero-in flex flex-wrap items-center justify-center gap-3"
             style={{ animationDelay: "0s" }}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            Disponible pour missions
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/5 text-green-400 text-xs font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              Disponible pour missions
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-zinc-700/60 text-zinc-500 text-xs font-mono">
+              🇯🇵 Tokyo • Remote
+            </div>
           </div>
 
           <p
-            className="animate-hero-in text-violet-400 text-xs font-mono tracking-[0.25em] uppercase"
+            className="animate-hero-in text-rose-400 text-xs font-mono tracking-[0.25em] uppercase"
             style={{ animationDelay: "0.1s" }}
           >
             Bonjour, je suis
@@ -531,13 +531,7 @@ export default function Home() {
 
           {/* Letter-by-letter name */}
           <h1
-            className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none"
-            style={{
-              background: "linear-gradient(to right, #a78bfa, #d8b4fe, #22d3ee)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
+            className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none text-white"
             aria-label="Alexis Gruny"
           >
             {"Alexis Gruny".split("").map((char, i) => (
@@ -572,7 +566,7 @@ export default function Home() {
           >
             <a
               href={`mailto:${CONTACT.email}`}
-              className="px-6 py-3 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold transition-all duration-200 hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] hover:-translate-y-0.5"
+              className="px-6 py-3 rounded-full bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold transition-all duration-200 hover:shadow-[0_0_30px_rgba(244,63,94,0.5)] hover:-translate-y-0.5"
             >
               Me contacter
             </a>
@@ -608,7 +602,7 @@ export default function Home() {
             {/* Text */}
             <div>
               <div data-animate className="reveal mb-6">
-                <p className="text-violet-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
+                <p className="text-rose-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
                   À propos
                 </p>
                 <h2 className="text-3xl sm:text-4xl font-bold">
@@ -621,18 +615,18 @@ export default function Home() {
                 style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}
               >
                 <p>
-                  Développeur web fullstack, je construis des applications de A
-                  à Z — de la base de données à l&apos;interface. J&apos;aime
-                  les projets où l&apos;attention au détail fait la différence.
+                  Développeur web fullstack basé à Tokyo. Je code des applis de
+                  A à Z — de la DB à l&apos;interface — avec une obsession pour
+                  les détails qui changent vraiment quelque chose.
                 </p>
                 <p>
-                  React et Next.js sont mon terrain de jeu principal.
-                  À l&apos;aise aussi bien sur le front que sur le back avec
-                  Node.js.
+                  React et Next.js au quotidien, Node.js côté back. J&apos;aime
+                  les projets concrets avec de vraies contraintes, pas les PoC
+                  qui restent dans un drawer.
                 </p>
-                <p className="text-zinc-500 text-sm italic border-l-2 border-violet-500/40 pl-4">
-                  En dehors du code, tu me trouveras sur League of Legends à
-                  perdre mes games de ranked.
+                <p className="text-zinc-500 text-sm italic border-l-2 border-rose-500/40 pl-4">
+                  Le soir, je feed en ranked sur League of Legends. C&apos;est
+                  pas glorieux, mais c&apos;est honnête.
                 </p>
               </div>
             </div>
@@ -654,7 +648,7 @@ export default function Home() {
                 </div>
                 <div className="p-5 font-mono text-xs leading-7">
                   <p>
-                    <span className="text-violet-400">const</span>{" "}
+                    <span className="text-rose-400">const</span>{" "}
                     <span className="text-cyan-300">dev</span>{" "}
                     <span className="text-zinc-400">=</span> {"{"}
                   </p>
@@ -665,6 +659,10 @@ export default function Home() {
                   <p className="ml-4">
                     <span className="text-zinc-400">role:</span>{" "}
                     <span className="text-green-300">&quot;Fullstack Dev&quot;</span>,
+                  </p>
+                  <p className="ml-4">
+                    <span className="text-zinc-400">location:</span>{" "}
+                    <span className="text-green-300">&quot;Tokyo 🇯🇵&quot;</span>,
                   </p>
                   <p className="ml-4">
                     <span className="text-zinc-400">stack:</span> [
@@ -680,7 +678,7 @@ export default function Home() {
                   <p className="ml-4">],</p>
                   <p className="ml-4">
                     <span className="text-zinc-400">available:</span>{" "}
-                    <span className="text-violet-300">true</span>,
+                    <span className="text-rose-300">true</span>,
                   </p>
                   <p className="ml-4 text-zinc-600">
                     {`// open to missions & CDI`}
@@ -697,7 +695,7 @@ export default function Home() {
       <section id="projets" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <div data-animate className="reveal mb-14">
-            <p className="text-violet-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
+            <p className="text-rose-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
               Projets
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold">
@@ -740,16 +738,16 @@ export default function Home() {
         {/* Ambient glow */}
         <div
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-violet-600/8 blur-[140px] pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[300px] rounded-full bg-rose-500/5 blur-[120px] pointer-events-none"
         />
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <div data-animate className="reveal">
-            <p className="text-violet-400 text-xs font-mono tracking-[0.25em] uppercase mb-4">
+            <p className="text-rose-400 text-xs font-mono tracking-[0.25em] uppercase mb-4">
               Contact
             </p>
             <h2 className="text-4xl sm:text-6xl font-bold mb-5">
               Travaillons{" "}
-              <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="text-rose-400">
                 ensemble
               </span>
             </h2>
@@ -759,7 +757,7 @@ export default function Home() {
             </p>
             <a
               href={`mailto:${CONTACT.email}`}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-[0_0_60px_rgba(139,92,246,0.45)] hover:-translate-y-1"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-[0_0_40px_rgba(244,63,94,0.4)] hover:-translate-y-1"
             >
               <MailIcon />
               {CONTACT.email}
@@ -772,7 +770,7 @@ export default function Home() {
       <footer className="border-t border-zinc-800/60 py-10 px-6">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-zinc-600 text-sm">
-            © 2025{" "}
+            © 2026{" "}
             <span className="text-zinc-400 font-medium">Alexis Gruny</span>
           </p>
           <nav

@@ -57,15 +57,12 @@ body {
 .animate-letter {
   display: inline-block;
   animation: letter-appear 0.5s ease-out both;
-  background: linear-gradient(to right, #a78bfa, #d8b4fe, #22d3ee);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
 }
 
 /* ── Gradient text fix ────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(to right, #a78bfa, #d8b4fe, #22d3ee);
+  background: linear-gradient(to right, #fb7185, #f43f5e);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -90,13 +87,6 @@ body {
   animation-delay: var(--reveal-delay, 0s);
 }
 
-/* ── Background grid ──────────────────────────────────────────── */
-.hero-grid {
-  background-image:
-    linear-gradient(to right, rgba(139, 92, 246, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
-  background-size: 64px 64px;
-}
 
 /* ── Noise texture overlay ────────────────────────────────────── */
 .noise {
