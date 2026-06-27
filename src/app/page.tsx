@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { ContactForm } from "./contact-form";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,7 +38,7 @@ const PROJECTS: Project[] = [
       "App React/Node autour des cartes Pokémon. Browse, recherche et gestion de collection.",
     stack: ["React", "Node.js"],
     mockupType: "pokemon",
-    liveUrl: undefined,
+    liveUrl: "https://pokemonpockettrade.vercel.app/",
     githubUrl: "https://github.com/alexisgruny/Pokemon-tcg-test"
   },
 ];
@@ -124,24 +125,6 @@ function ExternalLinkIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
-function MailIcon({ className = "w-5 h-5" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-      />
-    </svg>
-  );
-}
 
 function ChevronDownIcon() {
   return (
@@ -155,93 +138,6 @@ function ChevronDownIcon() {
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
     </svg>
-  );
-}
-
-// ─── Custom Cursor ────────────────────────────────────────────────────────────
-
-function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const mouse = useRef({ x: -200, y: -200 });
-  const ringPos = useRef({ x: -200, y: -200 });
-  const hovering = useRef(false);
-
-  useEffect(() => {
-    let raf: number;
-
-    const onMove = (e: MouseEvent) => {
-      mouse.current = { x: e.clientX, y: e.clientY };
-      if (dotRef.current) {
-        dotRef.current.style.opacity = "1";
-      }
-    };
-
-    const onOver = (e: MouseEvent) => {
-      const interactive = (e.target as Element).closest("a, button");
-      if (interactive && !hovering.current) {
-        hovering.current = true;
-        if (ringRef.current) {
-          ringRef.current.style.width = "48px";
-          ringRef.current.style.height = "48px";
-          ringRef.current.style.borderColor = "rgba(244, 63, 94, 0.7)";
-        }
-        if (dotRef.current) dotRef.current.style.opacity = "0";
-      } else if (!interactive && hovering.current) {
-        hovering.current = false;
-        if (ringRef.current) {
-          ringRef.current.style.width = "32px";
-          ringRef.current.style.height = "32px";
-          ringRef.current.style.borderColor = "rgba(244, 63, 94, 0.35)";
-        }
-        if (dotRef.current) dotRef.current.style.opacity = "1";
-      }
-    };
-
-    const animate = () => {
-      if (dotRef.current) {
-        dotRef.current.style.left = `${mouse.current.x}px`;
-        dotRef.current.style.top = `${mouse.current.y}px`;
-      }
-      ringPos.current.x += (mouse.current.x - ringPos.current.x) * 0.12;
-      ringPos.current.y += (mouse.current.y - ringPos.current.y) * 0.12;
-      if (ringRef.current) {
-        ringRef.current.style.left = `${ringPos.current.x}px`;
-        ringRef.current.style.top = `${ringPos.current.y}px`;
-      }
-      raf = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseover", onOver);
-    raf = requestAnimationFrame(animate);
-
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseover", onOver);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  return (
-    <>
-      <div
-        ref={dotRef}
-        aria-hidden="true"
-        className="fixed top-0 left-0 z-[9999] pointer-events-none -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-rose-400 opacity-0 transition-opacity duration-150"
-      />
-      <div
-        ref={ringRef}
-        aria-hidden="true"
-        className="fixed top-0 left-0 z-[9998] pointer-events-none -translate-x-1/2 -translate-y-1/2 rounded-full border"
-        style={{
-          width: "32px",
-          height: "32px",
-          borderColor: "rgba(244, 63, 94, 0.35)",
-          transition: "width 0.2s ease, height 0.2s ease, border-color 0.2s ease",
-        }}
-      />
-    </>
   );
 }
 
@@ -313,7 +209,7 @@ const MOCKUP_CONFIG = {
   pokemon: {
     src: "/pokemonTgcp.png",
     alt: "Aperçu de l'app Pokémon TCG Trade",
-    url: "pokemon-tcg.vercel.app",
+    url: "pokemonpockettrade.vercel.app",
   },
 } as const;
 
@@ -449,7 +345,6 @@ export default function Home() {
         className="noise fixed inset-0 z-[2] pointer-events-none"
       />
 
-      <CustomCursor />
       <Navbar />
 
       {/* ══════════════════════════════════════════════════════ HERO */}
@@ -707,17 +602,11 @@ export default function Home() {
                 ensemble
               </span>
             </h2>
-            <p className="text-zinc-400 mb-10 max-w-md mx-auto leading-relaxed">
+            <p className="text-zinc-400 mb-8 max-w-md mx-auto leading-relaxed">
               Un projet en tête ? Une mission freelance ? Je suis disponible
               pour en parler.
             </p>
-            <a
-              href={`mailto:${CONTACT.email}`}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-[0_0_40px_rgba(244,63,94,0.4)] hover:-translate-y-1"
-            >
-              <MailIcon />
-              {CONTACT.email}
-            </a>
+            <ContactForm />
           </div>
         </div>
       </section>
