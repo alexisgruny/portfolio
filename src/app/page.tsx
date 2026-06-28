@@ -1,24 +1,9 @@
-"use client";
-
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { ContactForm } from "./contact-form";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type Project = {
-  title: string;
-  description: string;
-  stack: string[];
-  mockupType: "chalet" | "pokemon";
-  liveUrl?: string;
-  githubUrl?: string;
-};
-
-type StackItem = {
-  label: string;
-  colorClass: string;
-};
+import { Navbar } from "./navbar";
+import { ProjectCard } from "./project-card";
+import type { Project } from "./project-card";
+import { ScrollReveal } from "./scroll-reveal";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -30,7 +15,7 @@ const PROJECTS: Project[] = [
     stack: ["Next.js", "TypeScript"],
     mockupType: "chalet",
     liveUrl: "https://chalet-jaia-preview.vercel.app/",
-    githubUrl: "https://github.com/alexisgruny/chalet-site"
+    githubUrl: "https://github.com/alexisgruny/chalet-site",
   },
   {
     title: "Pokemon TCG",
@@ -39,9 +24,14 @@ const PROJECTS: Project[] = [
     stack: ["React", "Node.js"],
     mockupType: "pokemon",
     liveUrl: "https://pokemonpockettrade.vercel.app/",
-    githubUrl: "https://github.com/alexisgruny/Pokemon-tcg-test"
+    githubUrl: "https://github.com/alexisgruny/Pokemon-tcg-test",
   },
 ];
+
+type StackItem = {
+  label: string;
+  colorClass: string;
+};
 
 const STACK: StackItem[] = [
   {
@@ -106,8 +96,6 @@ function GitHubIcon({ className = "w-5 h-5" }: { className?: string }) {
   );
 }
 
-
-
 function ChevronDownIcon() {
   return (
     <svg
@@ -123,166 +111,13 @@ function ChevronDownIcon() {
   );
 }
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-
-function Navbar() {
-  const [visible, setVisible] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
-  const lastY = useRef(0);
-
-  useEffect(() => {
-    const handler = () => {
-      const y = window.scrollY;
-      setScrolled(y > 60);
-      setVisible(y < 60 || y < lastY.current);
-      lastY.current = y;
-    };
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
-
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "border-b border-zinc-800/50 bg-[#0a0a0a]/80 backdrop-blur-xl"
-          : ""
-      } ${visible ? "translate-y-0" : "-translate-y-full"}`}
-    >
-      <nav className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-        <button
-          onClick={() => scrollTo("hero")}
-          className="text-sm font-bold font-mono tracking-tight text-white hover:text-rose-400 transition-colors"
-        >
-          AG<span className="text-rose-500">.</span>
-        </button>
-        <div className="flex gap-1 text-sm text-zinc-400">
-          {[
-            { id: "about", label: "À propos" },
-            { id: "projets", label: "Projets" },
-            { id: "stack", label: "Stack" },
-            { id: "contact", label: "Contact" },
-          ].map(({ id, label }) => (
-            <button
-              key={id}
-              onClick={() => scrollTo(id)}
-              className="px-3 py-2 rounded-lg hover:text-white hover:bg-zinc-800/50 transition-all duration-200"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </nav>
-    </header>
-  );
-}
-
-// ─── Project Mockup ───────────────────────────────────────────────────────────
-
-const MOCKUP_CONFIG = {
-  chalet: {
-    src: "/DemoChaletJaia.png",
-    alt: "Aperçu du site Chalet JAIA",
-    url: "chalet-jaia-preview.vercel.app",
-  },
-  pokemon: {
-    src: "/pokemonTgcp.png",
-    alt: "Aperçu de l'app Pokémon TCG Trade",
-    url: "pokemonpockettrade.vercel.app",
-  },
-} as const;
-
-function ProjectMockup({ type }: { type: "chalet" | "pokemon" }) {
-  const { src, alt, url } = MOCKUP_CONFIG[type];
-  return (
-    <div className="rounded-xl overflow-hidden border border-zinc-700/50 mb-5 select-none">
-      {/* Browser chrome */}
-      <div className="flex items-center gap-1.5 px-3 py-2 bg-zinc-800/80 border-b border-zinc-700/50">
-        <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
-        <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-        <div className="flex-1 ml-2 h-4 rounded-sm bg-zinc-700/60 flex items-center px-2">
-          <span className="text-[9px] text-zinc-500 font-mono">{url}</span>
-        </div>
-      </div>
-      {/* Screenshot */}
-      <div className="relative h-40 overflow-hidden">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className="object-cover object-top"
-          sizes="(max-width: 640px) 100vw, 50vw"
-        />
-      </div>
-    </div>
-  );
-}
-
-// ─── Project Card ─────────────────────────────────────────────────────────────
-
-function ProjectCard({ project, delay }: { project: Project; delay: number }) {
-  return (
-    <article
-      data-animate
-      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
-      className="reveal group relative flex flex-col p-5 rounded-2xl border border-zinc-800 bg-zinc-900/30 hover:border-rose-500/40 transition-colors duration-300 cursor-pointer"
-      onClick={() => {
-        if (project.liveUrl)
-          window.open(project.liveUrl, "_blank", "noopener,noreferrer");
-      }}
-    >
-      <ProjectMockup type={project.mockupType} />
-
-      <div className="flex items-start justify-between gap-4 mb-2">
-        <h3 className="text-lg font-bold text-white">{project.title}</h3>
-        {project.githubUrl && (
-          <a
-            href={project.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Code source — ${project.title}`}
-            className="shrink-0 text-zinc-500 hover:text-white transition-colors pt-0.5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <GitHubIcon />
-          </a>
-        )}
-      </div>
-
-      <p className="text-zinc-400 text-sm leading-relaxed mb-4 flex-1">
-        {project.description}
-      </p>
-
-      <div className="flex flex-wrap gap-1.5">
-        {project.stack.map((tech) => (
-          <span
-            key={tech}
-            className="px-2.5 py-0.5 text-xs rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700"
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-600/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-      />
-    </article>
-  );
-}
-
 // ─── Stack Badge ──────────────────────────────────────────────────────────────
 
 function StackBadge({ item, delay }: { item: StackItem; delay: number }) {
   return (
     <span
       data-animate
-      style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
+      style={{ "--reveal-delay": `${delay}s` } as CSSProperties}
       className={`reveal px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200 cursor-default hover:-translate-y-0.5 ${item.colorClass}`}
     >
       {item.label}
@@ -293,32 +128,14 @@ function StackBadge({ item, delay }: { item: StackItem; delay: number }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    document
-      .querySelectorAll("[data-animate]")
-      .forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans">
-      {/* Global noise texture */}
       <div
         aria-hidden="true"
         className="noise fixed inset-0 z-[2] pointer-events-none"
       />
 
+      <ScrollReveal />
       <Navbar />
 
       {/* ══════════════════════════════════════════════════════ HERO */}
@@ -326,14 +143,12 @@ export default function Home() {
         id="hero"
         className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center overflow-hidden"
       >
-        {/* Ambient glow */}
         <div
           aria-hidden="true"
           className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full bg-rose-500/5 blur-[120px] pointer-events-none"
         />
 
         <div className="relative z-10 flex flex-col items-center gap-5 max-w-3xl w-full">
-          {/* Status + location badges */}
           <div
             className="animate-hero-in flex flex-wrap items-center justify-center gap-3"
             style={{ animationDelay: "0s" }}
@@ -354,7 +169,6 @@ export default function Home() {
             Bonjour, je suis
           </p>
 
-          {/* Letter-by-letter name */}
           <h1
             className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none text-white"
             aria-label="Alexis Gruny"
@@ -365,7 +179,7 @@ export default function Home() {
                 className="animate-letter"
                 style={{ animationDelay: `${0.2 + i * 0.05}s` }}
               >
-                {char === " " ? "\u00A0" : char}
+                {char === " " ? " " : char}
               </span>
             ))}
           </h1>
@@ -390,7 +204,7 @@ export default function Home() {
             style={{ animationDelay: "1.25s" }}
           >
             <a
-              href={`mailto:${CONTACT.email}`}
+              href="#contact"
               className="px-6 py-3 rounded-full bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold transition-all duration-200 hover:shadow-[0_0_30px_rgba(244,63,94,0.5)] hover:-translate-y-0.5"
             >
               Me contacter
@@ -407,7 +221,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Scroll hint */}
         <div
           aria-hidden="true"
           className="animate-hero-in absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-zinc-600 text-xs"
@@ -424,7 +237,6 @@ export default function Home() {
       <section id="about" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Text */}
             <div>
               <div data-animate className="reveal mb-6">
                 <p className="text-rose-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
@@ -437,7 +249,7 @@ export default function Home() {
               <div
                 data-animate
                 className="reveal space-y-4 text-zinc-400 leading-relaxed"
-                style={{ "--reveal-delay": "0.1s" } as React.CSSProperties}
+                style={{ "--reveal-delay": "0.1s" } as CSSProperties}
               >
                 <p>
                   Développeur web fullstack basé à Tokyo. Je code des applis de
@@ -456,11 +268,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Terminal decoration */}
             <div
               data-animate
               className="reveal hidden lg:block"
-              style={{ "--reveal-delay": "0.15s" } as React.CSSProperties}
+              style={{ "--reveal-delay": "0.15s" } as CSSProperties}
             >
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 overflow-hidden">
                 <div className="flex items-center gap-1.5 px-4 py-3 border-b border-zinc-800 bg-zinc-900/80">
@@ -560,7 +371,6 @@ export default function Home() {
 
       {/* ══════════════════════════════════════════════════ CONTACT */}
       <section id="contact" className="py-28 px-6 relative overflow-hidden">
-        {/* Ambient glow */}
         <div
           aria-hidden="true"
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[300px] rounded-full bg-rose-500/5 blur-[120px] pointer-events-none"
@@ -572,9 +382,7 @@ export default function Home() {
             </p>
             <h2 className="text-4xl sm:text-6xl font-bold mb-5">
               Travaillons{" "}
-              <span className="text-rose-400">
-                ensemble
-              </span>
+              <span className="text-rose-400">ensemble</span>
             </h2>
             <p className="text-zinc-400 mb-8 max-w-md mx-auto leading-relaxed">
               Un projet en tête ? Une mission freelance ? Je suis disponible
