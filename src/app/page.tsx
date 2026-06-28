@@ -106,24 +106,6 @@ function GitHubIcon({ className = "w-5 h-5" }: { className?: string }) {
   );
 }
 
-function ExternalLinkIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-      />
-    </svg>
-  );
-}
 
 
 function ChevronDownIcon() {
@@ -247,36 +229,28 @@ function ProjectCard({ project, delay }: { project: Project; delay: number }) {
     <article
       data-animate
       style={{ "--reveal-delay": `${delay}s` } as React.CSSProperties}
-      className="reveal group relative flex flex-col p-5 rounded-2xl border border-zinc-800 bg-zinc-900/30 hover:border-rose-500/40 transition-colors duration-300"
+      className="reveal group relative flex flex-col p-5 rounded-2xl border border-zinc-800 bg-zinc-900/30 hover:border-rose-500/40 transition-colors duration-300 cursor-pointer"
+      onClick={() => {
+        if (project.liveUrl)
+          window.open(project.liveUrl, "_blank", "noopener,noreferrer");
+      }}
     >
       <ProjectMockup type={project.mockupType} />
 
       <div className="flex items-start justify-between gap-4 mb-2">
         <h3 className="text-lg font-bold text-white">{project.title}</h3>
-        <div className="flex shrink-0 gap-2.5 text-zinc-500 pt-0.5">
-          {project.githubUrl && (
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Code source — ${project.title}`}
-              className="hover:text-white transition-colors"
-            >
-              <GitHubIcon />
-            </a>
-          )}
-          {project.liveUrl && (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Site live — ${project.title}`}
-              className="hover:text-cyan-400 transition-colors"
-            >
-              <ExternalLinkIcon className="w-5 h-5" />
-            </a>
-          )}
-        </div>
+        {project.githubUrl && (
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Code source — ${project.title}`}
+            className="shrink-0 text-zinc-500 hover:text-white transition-colors pt-0.5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GitHubIcon />
+          </a>
+        )}
       </div>
 
       <p className="text-zinc-400 text-sm leading-relaxed mb-4 flex-1">
