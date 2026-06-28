@@ -58,13 +58,6 @@ body {
   color: white;
 }
 
-/* ── Gradient text fix ────────────────────────────────────────── */
-.gradient-text {
-  background: linear-gradient(to right, #fb7185, #f43f5e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
 
 /* ── Scroll reveal ────────────────────────────────────────────── */
 @keyframes reveal-up {
