@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+﻿import type { CSSProperties } from "react";
 import { ContactForm } from "./contact-form";
 import { Navbar } from "./navbar";
 import { ProjectCard } from "./project-card";
@@ -156,16 +156,23 @@ export default function Home() {
           </p>
 
           <h1
-            className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none text-white"
+            className="flex flex-wrap items-end justify-center gap-x-[0.3em] text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-none text-white"
             aria-label="Alexis Gruny"
           >
-            {"Alexis Gruny".split("").map((char, i) => (
-              <span
-                key={i}
-                className="animate-letter"
-                style={{ animationDelay: `${0.2 + i * 0.05}s` }}
-              >
-                {char === " " ? " " : char}
+            {(["Alexis", "Gruny"] as const).map((word, wi) => (
+              <span key={word} className="whitespace-nowrap">
+                {word.split("").map((char, i) => {
+                  const delay = 0.2 + (wi === 0 ? i : 7 + i) * 0.05;
+                  return (
+                    <span
+                      key={i}
+                      className="animate-letter"
+                      style={{ animationDelay: `${delay}s` }}
+                    >
+                      {char}
+                    </span>
+                  );
+                })}
               </span>
             ))}
           </h1>
@@ -213,7 +220,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════ À PROPOS */}
       <section id="about" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div>
               <div data-animate className="reveal mb-6">
                 <p className="text-rose-400 text-xs font-mono tracking-[0.25em] uppercase mb-2">
@@ -247,7 +254,7 @@ export default function Home() {
 
             <div
               data-animate
-              className="reveal hidden lg:block"
+              className="reveal hidden md:block"
               style={{ "--reveal-delay": "0.15s" } as CSSProperties}
             >
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 overflow-hidden">
